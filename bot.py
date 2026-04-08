@@ -1,7 +1,7 @@
 import requests
 
 # Твої дані з останніх скріншотів
-TOKEN = "8635960397:AAGZJAPwCIXZ02iWJd0r5YxZlqEuKR0W5Cc"
+TOKEN = "8635960397:AAGZJAPwCIXZO2iWJdOr5YxZlqEuKROW5Cc"
 CHAT_ID = "913214131"
 
 def check():
