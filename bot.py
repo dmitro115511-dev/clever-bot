@@ -24,7 +24,7 @@ def check():
                 last_status = f.read().strip()
 
         # Якщо статус змінився — відправляємо повідомлення
-        if current_status != last_status:
+        if True:
             text = f"🚨 Зміна на станції Clever!\n{current_status}"
             requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", 
                           json={"chat_id": CHAT_ID, "text": text})
