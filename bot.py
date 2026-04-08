@@ -25,5 +25,3 @@ def check():
     except Exception as e:
         print(f"❌ Помилка мережі: {e}")
 
-if __name__ == "__main__":
-    check()
