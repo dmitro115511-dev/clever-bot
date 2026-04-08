@@ -1,26 +1,29 @@
 import requests
 
+# Твої дані з останніх скріншотів
 TOKEN = "8635960397:AAGZJAPwCIXZ02iWJd0r5YxZlqEuKR0W5Cc"
 CHAT_ID = "913214131"
 
 def check():
-    print("Запуск перевірки...")
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    
+    # 1. Спробуємо спочатку просто привітатися
+    print(f"Намагаюся написати на ID: {CHAT_ID}")
+    
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": "Привіт! Якщо ти це бачиш — зв'язок налаштовано! 🎉"
+    }
+    
     try:
-        # Робимо запит до Clever
-        r_clever = requests.get("https://clever-app-prod.azurewebsites.net/api/v4/stations/1025698", timeout=10)
-        status_text = "Станція доступна" if r_clever.status_code == 200 else "Помилка Clever"
+        r = requests.post(url, json=payload, timeout=10)
+        print(f"Статус відповіді Telegram: {r.status_code}")
+        print(f"Що каже Telegram: {r.text}")
         
-        # Спроба відправити в Telegram
-        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-        payload = {"chat_id": CHAT_ID, "text": f"✅ Тест зв'язку!\nСтатус: {status_text}"}
-        
-        r_tg = requests.post(url, json=payload)
-        
-        print(f"Відповідь Telegram: {r_tg.status_code}")
-        print(f"Текст відповіді: {r_tg.text}")
-        
+        if r.status_code != 200:
+            print("❌ Telegram відхилив повідомлення!")
     except Exception as e:
-        print(f"Сталася помилка: {e}")
+        print(f"❌ Помилка мережі: {e}")
 
 if __name__ == "__main__":
     check()
