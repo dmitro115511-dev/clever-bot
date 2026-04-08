@@ -1,30 +1,43 @@
 import requests
+import os
 
-# Твій токен зі скріншоту
-TOKEN = "8604060417:AAEHgQExyUHp-feyosGhBrAHzey1XHZlmHKU"
-# Твій ID
+# Нові дані з твоїх скріншотів
+TOKEN = "8635960397:AAGZJAPwCIXZ02iWJd0r5YxZlqEuKR0W5Cc"
 CHAT_ID = "913214131"
+STATE_FILE = "last_status.txt"
 
 def check():
     try:
-        # Запит до станції Clever
+        # Отримуємо дані станції
         r = requests.get("https://clever-app-prod.azurewebsites.net/api/v4/stations/1025698", timeout=15)
+        if r.status_code != 200:
+            return
         
-        if r.status_code == 200:
-            data = r.json()
-            # Отримуємо статус (чи є вільні павербанки)
-            status = data.get("status", "Невідомо")
-            text = f"Статус станції Clever: {status}"
-        else:
-            text = f"Помилка сайту Clever: {r.status_code}"
+        data = r.json()
+        # Створюємо рядок зі статусом (наприклад, кількість павербанків)
+        current_status = f"Статус: {data.get('status', '?')}. Вільних: {data.get('free_count', '?')}"
+        
+        # Перевіряємо, що було минулого разу
+        last_status = ""
+        if os.path.exists(STATE_FILE):
+            with open(STATE_FILE, "r") as f:
+                last_status = f.read().strip()
+
+        # Якщо статус змінився — відправляємо повідомлення
+        if current_status != last_status:
+            text = f"🚨 Зміна на станції Clever!\n{current_status}"
+            requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", 
+                          json={"chat_id": CHAT_ID, "text": text})
             
-        # Відправка в Telegram
-        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-        requests.post(url, json={"chat_id": CHAT_ID, "text": text})
-        print("Повідомлення відправлено!")
+            # Оновлюємо збережений статус
+            with open(STATE_FILE, "w") as f:
+                f.write(current_status)
+            print("Статус змінився, повідомлення відправлено.")
+        else:
+            print("Змін немає. Мовчимо.")
 
     except Exception as e:
-        print(f"Сталася помилка: {e}")
+        print(f"Помилка: {e}")
 
 if __name__ == "__main__":
     check()
